@@ -1,0 +1,19 @@
+# Data and outputs (usually excluded)
+data/
+output/
+logs/
+
+# Python stuff
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# Environment
+.env
+venv/
+env/
+
+# OS files
+.DS_Store
