@@ -29,7 +29,7 @@ initial_params = {
     'epoch_decay_interval': 5,
     'l2_lambda': 0.01,
     'dropout_rate': 0.1,
-    'zero_dropout_in_first_layer': True,
+    'skip_dropout_in_first_conv_layer': True,
     'batch_size': 64
 }
 
@@ -45,7 +45,7 @@ tuning_grid = {
     'epoch_decay_interval': [5, 10, 25, 50],
     'l2_lambda': [0.001, 0.01, 0.1, 1],
     'dropout_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
-    'zero_dropout_in_first_layer': [True, False],
+    'skip_dropout_in_first_conv_layer': [True, False],
     'batch_size': [64, 128, 256, 512]
 }
 
@@ -61,6 +61,6 @@ post_tuning_params = {
     'epoch_decay_interval': 10,
     'l2_lambda': 0.05,
     'dropout_rate': 0.4,
-    'zero_dropout_in_first_layer': True,
+    'skip_dropout_in_first_conv_layer': True,
     'batch_size': 64
 }
