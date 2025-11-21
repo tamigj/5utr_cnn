@@ -15,11 +15,11 @@ from utils import build_cnn_model, tune_hyperparameter
 data = np.load(f'{DATA_DIR}/preprocessed_data.npz')
 
 X_train = data['X_train']
-y_train = data['y_train']
+Y_train = data['Y_train']
 X_dev = data['X_dev']
-y_dev = data['y_dev']
+Y_dev = data['Y_dev']
 X_test = data['X_test']
-y_test = data['y_test']
+Y_test = data['Y_test']
 
 # Extract parameters
 batch_size = initial_params['batch_size']
@@ -55,6 +55,6 @@ if __name__ == "__main__":
     # Run tuning
     results = tune_hyperparameter(param_name, param_values,
                                   initial_params, steps_per_epoch,
-                                  X_train, y_train, X_dev, y_dev)
+                                  X_train, Y_train, X_dev, Y_dev)
 
     print("\nTuning complete!")

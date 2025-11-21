@@ -95,22 +95,22 @@ def split_data(df, train_prop, dev_prop, test_prop, random_state=42):
     return train_df, dev_df, test_df
 
 def prepare_xy(df):
-    """Prepare input features (X) and target values (y) from dataframe.
+    """Prepare input features (X) and target values (Y) from dataframe.
     
     Args:
         df (pd.DataFrame): DataFrame containing 'ref_sequence' and
             'pw_mean_translation' columns.
     
     Returns:
-        tuple: Tuple of (X, y) where:
+        tuple: Tuple of (X, Y) where:
             - X (np.ndarray): Numpy array of one-hot encoded sequences,
                 shape (n_samples, MAX_SEQ_LEN, N_BASES).
-            - y (np.ndarray): Numpy array of translation efficiency values,
+            - Y (np.ndarray): Numpy array of translation efficiency values,
                 shape (n_samples,), dtype float32.
     """
     X = np.stack([one_hot_encode(seq) for seq in df['ref_sequence']])
-    y = df['pw_mean_translation'].values.astype(np.float32)
-    return X, y
+    Y = df['pw_mean_translation'].values.astype(np.float32)
+    return X, Y
 
 
 #------------------------#
@@ -158,51 +158,50 @@ def build_cnn_model(n_conv_layers, n_filters, filter_size,
         tf.keras.Model: Compiled Keras Model ready for training with MSE loss
             and MAE metric.
     """
+    # --- Input ---
+    input_seq = tf.keras.Input(shape=INPUT_SHAPE)
+    x = input_seq
 
-  # --- Input ---
-  input_seq = tf.keras.Input(shape=INPUT_SHAPE)
-  x = input_seq
+    # --- CONV blocks ---
+    for i in range(n_conv_layers):
+        current_dropout = 0 if (i == 0 and skip_dropout_in_first_conv_layer) else dropout_rate
 
-  # --- CONV blocks ---
-  for i in range(n_conv_layers):
-    current_dropout = 0 if (i == 0 and skip_dropout_in_first_conv_layer) else dropout_rate
+        x = tf.keras.layers.Conv1D(n_filters, filter_size, padding='same',
+                                   kernel_initializer='he_normal',
+                                   kernel_regularizer=regularizers.l2(l2_lambda))(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation('relu')(x)
+        x = tf.keras.layers.Dropout(current_dropout)(x)
 
-    x = tf.keras.layers.Conv1D(n_filters, filter_size, padding='same',
-                               kernel_initializer='he_normal',
-                               kernel_regularizer=regularizers.l2(l2_lambda))(x)
-    x = tf.keras.layers.BatchNormalization()(x)
-    x = tf.keras.layers.Activation('relu')(x)
-    x = tf.keras.layers.Dropout(current_dropout)(x)
+    # --- Global pooling ---
+    x = tf.keras.layers.GlobalAveragePooling1D()(x)
 
-  # --- Global pooling ---
-  x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    # --- FC blocks ---
+    for i in range(n_dense_layers):
+        x = tf.keras.layers.Dense(n_dense_units,
+                                  kernel_initializer='he_normal',
+                                  kernel_regularizer=regularizers.l2(l2_lambda))(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Activation('relu')(x)
+        x = tf.keras.layers.Dropout(dropout_rate)(x)
 
-  # --- FC blocks ---
-  for i in range(n_dense_layers):
-    x = tf.keras.layers.Dense(n_dense_units,
-                              kernel_initializer='he_normal',
-                              kernel_regularizer=regularizers.l2(l2_lambda))(x)
-    x = tf.keras.layers.BatchNormalization()(x)
-    x = tf.keras.layers.Activation('relu')(x)
-    x = tf.keras.layers.Dropout(dropout_rate)(x)
+    output = tf.keras.layers.Dense(1,
+                                   kernel_regularizer=regularizers.l2(l2_lambda))(x)
 
-  output = tf.keras.layers.Dense(1,
-                                 kernel_regularizer=regularizers.l2(l2_lambda))(x)
+    # --- Learning rate decay ---
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=learning_rate,
+        decay_steps=steps_per_epoch * epoch_decay_interval,
+        decay_rate=decay_rate,
+        staircase=True
+    )
 
-  # --- Learning rate decay ---
-  lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-      initial_learning_rate=learning_rate,
-      decay_steps=steps_per_epoch * epoch_decay_interval,
-      decay_rate=decay_rate,
-      staircase=True
-  )
+    # --- Build model ---
+    optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
+    model = tf.keras.Model(inputs=input_seq, outputs=output)
+    model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
 
-  # --- Build model ---
-  optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
-  model = tf.keras.Model(inputs=input_seq, outputs=output)
-  model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
-
-  return model
+    return model
 
 #--------------------------#
 # HYPERPARAMETER TUNING    #
@@ -211,7 +210,7 @@ def build_cnn_model(n_conv_layers, n_filters, filter_size,
 
 def tune_hyperparameter(param_name, param_values,
                         base_params, steps_per_epoch,
-                        X_train, y_train, X_dev, y_dev):
+                        X_train, Y_train, X_dev, Y_dev):
     """Tune a single hyperparameter by training models with different values.
     
     For each value in param_values, trains a model with that hyperparameter value
@@ -226,9 +225,9 @@ def tune_hyperparameter(param_name, param_values,
             modified for each trial).
         steps_per_epoch (int): Number of steps per epoch for learning rate decay.
         X_train (np.ndarray): Training input features.
-        y_train (np.ndarray): Training target values.
+        Y_train (np.ndarray): Training target values.
         X_dev (np.ndarray): Development/validation input features.
-        y_dev (np.ndarray): Development/validation target values.
+        Y_dev (np.ndarray): Development/validation target values.
     
     Returns:
         list: List of dictionaries, each containing:
@@ -253,8 +252,8 @@ def tune_hyperparameter(param_name, param_values,
         model = build_cnn_model(**current_params,
                                 steps_per_epoch=steps_per_epoch)
 
-        history = model.fit(X_train, y_train,
-                           validation_data=(X_dev, y_dev),
+        history = model.fit(X_train, Y_train,
+                           validation_data=(X_dev, Y_dev),
                            batch_size=batch_size,
                            epochs=NUM_EPOCH,
                            verbose=0)
