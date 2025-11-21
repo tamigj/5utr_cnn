@@ -40,7 +40,9 @@ def split_data(df, train_prop, dev_prop, test_prop, random_state=42):
   # Split the data
   train_df, tmp_df = train_test_split(df, train_size=train_prop,
                                       random_state=random_state, shuffle=True)
-  dev_df, test_df = train_test_split(tmp_df, test_size=test_prop,
+  # Calculate test_size relative to tmp_df (not original df)
+  test_size_in_tmp = test_prop / (dev_prop + test_prop)
+  dev_df, test_df = train_test_split(tmp_df, test_size=test_size_in_tmp,
                                      random_state=random_state, shuffle=True)
   return train_df, dev_df, test_df
 
