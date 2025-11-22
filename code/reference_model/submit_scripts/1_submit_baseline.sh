@@ -7,7 +7,7 @@
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:1
 
-conda activate cnn_env
+source activate cnn_env
 
 python ../data_preprocessing.py
 python ../baseline_model.py
