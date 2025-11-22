@@ -13,11 +13,11 @@ from utils import build_cnn_model
 data = np.load(f'{DATA_DIR}/preprocessed_data.npz')
 
 X_train = data['X_train']
-y_train = data['y_train']
+Y_train = data['Y_train']
 X_dev = data['X_dev']
-y_dev = data['y_dev']
+Y_dev = data['Y_dev']
 X_test = data['X_test']
-y_test = data['y_test']
+Y_test = data['Y_test']
 
 # Extract parameters
 batch_size = initial_params['batch_size']
@@ -31,8 +31,8 @@ model = build_cnn_model(**model_params, steps_per_epoch=steps_per_epoch)
 model.summary()
 
 # Fit the model
-history = model.fit(X_train, y_train,
-                    validation_data=(X_dev, y_dev),
+history = model.fit(X_train, Y_train,
+                    validation_data=(X_dev, Y_dev),
                     epochs=NUM_EPOCH,
                     batch_size=batch_size,
                     verbose=1)

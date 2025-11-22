@@ -18,12 +18,12 @@ train_df, dev_df, test_df = split_data(df,
                                        test_prop=test_prop)
 
 # Prepare X and Y for each set
-X_train, y_train = prepare_xy(train_df)
-X_dev, y_dev = prepare_xy(dev_df)
-X_test, y_test = prepare_xy(test_df)
+X_train, Y_train = prepare_xy(train_df)
+X_dev, Y_dev = prepare_xy(dev_df)
+X_test, Y_test = prepare_xy(test_df)
 
 # Save data
 np.savez(f'{DATA_DIR}/preprocessed_data.npz',
-         X_train=X_train, y_train=y_train,
-         X_dev=X_dev, y_dev=y_dev,
-         X_test=X_test, y_test=y_test)
+         X_train=X_train, Y_train=Y_train,
+         X_dev=X_dev, Y_dev=Y_dev,
+         X_test=X_test, Y_test=Y_test)
