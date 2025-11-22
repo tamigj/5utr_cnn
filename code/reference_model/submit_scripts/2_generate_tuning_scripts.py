@@ -1,18 +1,26 @@
 #!/usr/bin/env python
-"""Generate and submit tuning scripts from config.py tuning_grid.
+"""Generate and submit tuning scripts from tuning grids.
 
-This script reads the tuning_grid from config.py, creates bash submit scripts
-for each hyperparameter in the grid, and submits them to SLURM.
+This script creates bash submit scripts for each hyperparameter in the tuning
+grid and submits them to SLURM.
+
+Usage:
+    python 2_generate_tuning_scripts.py [strategy]
+    
+    strategy: 'wide', 'coarse', 'fine' (defaults to 'wide')
+             Or 'config' to use tuning_grid from config.py
 """
 
 import sys
 import os
 import subprocess
+import argparse
 
-# Add parent directory to path to import config
+# Add parent directory to path to import modules
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from config import tuning_grid
+from config import tuning_grid as config_tuning_grid
+from _tuning_grids import GRIDS
 
 # Script directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +37,27 @@ def format_values_for_bash(values):
         str: Space-separated string of values for use in bash commands.
     """
     return ' '.join(str(v) for v in values)
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(
+    description='Generate and submit hyperparameter tuning scripts.'
+)
+parser.add_argument(
+    'strategy',
+    nargs='?',
+    default='wide',
+    choices=list(GRIDS.keys()) + ['config'],
+    help='Tuning strategy: wide (default), coarse, fine, or config (use config.py)'
+)
+args = parser.parse_args()
+
+# Select tuning grid based on strategy
+if args.strategy == 'config':
+    tuning_grid = config_tuning_grid
+    print(f"Using tuning_grid from config.py")
+else:
+    tuning_grid = GRIDS[args.strategy]
+    print(f"Using {args.strategy} tuning grid")
 
 # Generate and submit scripts for each parameter
 for param_name, param_values in tuning_grid.items():
@@ -61,5 +90,5 @@ python ../hyperparameter_tuning.py {param_name} {values_str}
     else:
         print(f"Error submitting {script_path}: {result.stderr}")
 
-print(f"\nGenerated and submitted {len(tuning_grid)} tuning scripts")
+print(f"\nGenerated and submitted {len(tuning_grid)} tuning scripts using '{args.strategy}' strategy")
 
