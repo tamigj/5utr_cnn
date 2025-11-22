@@ -2,6 +2,7 @@
 data/
 output/
 logs/
+**/generated_scripts/
 
 # Python stuff
 __pycache__/
