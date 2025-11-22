@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 
-from config import MAX_SEQ_LEN, N_BASES, INPUT_SHAPE, NUM_EPOCH, OUTPUT_TUNING_DIR
+from config import MAX_SEQ_LEN, N_BASES, INPUT_SHAPE, NUM_EPOCH
 
 """
 Utility functions for 5' UTR CNN model training.
@@ -210,7 +210,8 @@ def build_cnn_model(n_conv_layers, n_filters, filter_size,
 
 def tune_hyperparameter(param_name, param_values,
                         base_params, steps_per_epoch,
-                        X_train, Y_train, X_dev, Y_dev):
+                        X_train, Y_train, X_dev, Y_dev,
+                        output_dir, strategy='initial'):
     """Tune a single hyperparameter by training models with different values.
     
     For each value in param_values, trains a model with that hyperparameter value
@@ -228,6 +229,8 @@ def tune_hyperparameter(param_name, param_values,
         Y_train (np.ndarray): Training target values.
         X_dev (np.ndarray): Development/validation input features.
         Y_dev (np.ndarray): Development/validation target values.
+        output_dir (str): Directory to save the tuning plot.
+        strategy (str, optional): Strategy name for filename. Defaults to 'initial'.
     
     Returns:
         list: List of dictionaries, each containing:
@@ -261,23 +264,25 @@ def tune_hyperparameter(param_name, param_values,
         results.append({'value': value, 'history': history})
 
     # Plot grid
-    plot_tuning_results(param_name, results)
+    plot_tuning_results(param_name, results, output_dir, strategy)
     return results
 
-def plot_tuning_results(param_name, results):
+def plot_tuning_results(param_name, results, output_dir, strategy='initial'):
     """Create and save a grid plot comparing hyperparameter tuning results.
     
     Generates a subplot grid showing training and validation loss curves for each
-    hyperparameter value tested. Saves the plot to OUTPUT_TUNING_DIR.
+    hyperparameter value tested. Saves the plot to the specified output directory.
     
     Args:
         param_name (str): Name of the hyperparameter that was tuned (used in
             title and filename).
         results (list): List of result dictionaries from tune_hyperparameter(),
             each containing 'value' and 'history' keys.
+        output_dir (str): Directory to save the plot.
+        strategy (str, optional): Strategy name for filename. Defaults to 'initial'.
     
     Note:
-        The plot is saved as: {OUTPUT_TUNING_DIR}/initial_tuning_{param_name}.png
+        The plot is saved as: {output_dir}/{strategy}_{param_name}.png
     """
     n_values = len(results)
 
@@ -316,7 +321,7 @@ def plot_tuning_results(param_name, results):
         axes[idx].axis('off')
 
     plt.tight_layout()
-    output_path = f'{OUTPUT_TUNING_DIR}/initial_tuning_{param_name}.png'
+    output_path = f'{output_dir}/{strategy}_{param_name}.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
     print(f"Saved plot to {output_path}")

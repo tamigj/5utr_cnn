@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+
 # Paths
 BASE_DIR = '/mnt/oak/users/tami/5utr_cnn'
 DATA_DIR = f'{BASE_DIR}/data'
@@ -64,3 +66,16 @@ post_tuning_params = {
     'skip_dropout_in_first_conv_layer': True,
     'batch_size': 64
 }
+
+def get_tuning_output_dir(strategy='wide'):
+    """Get output directory for a specific tuning strategy.
+    
+    Args:
+        strategy (str): Strategy name (wide, coarse, fine, etc.)
+    
+    Returns:
+        str: Path to strategy-specific output directory
+    """
+    strategy_dir = f'{OUTPUT_TUNING_DIR}/{strategy}'
+    os.makedirs(strategy_dir, exist_ok=True)
+    return strategy_dir
