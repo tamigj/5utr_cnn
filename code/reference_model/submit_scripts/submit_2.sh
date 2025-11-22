@@ -2,5 +2,5 @@
 
 conda activate cnn_env
 
-# Generate and submit tuning scripts from config.py
-python generate_tuning_scripts.py
+# Generate and submit tuning scripts using wide search strategy
+python 2_generate_tuning_scripts.py wide
