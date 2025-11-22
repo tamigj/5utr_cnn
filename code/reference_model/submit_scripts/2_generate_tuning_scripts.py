@@ -62,12 +62,12 @@ else:
 # Generate and submit scripts for each parameter
 for param_name, param_values in tuning_grid.items():
     values_str = format_values_for_bash(param_values)
-    script_path = os.path.join(generated_scripts_dir, f'submit_tune_{param_name}.sh')
+    script_path = os.path.join(generated_scripts_dir, f'submit_tune_{args.strategy}_{param_name}.sh')
     
     script_content = f"""#!/bin/bash
-#SBATCH --job-name=tune_{param_name}
-#SBATCH --output=../logs/tune_{param_name}_%j.log
-#SBATCH --error=../logs/tune_{param_name}_%j.err
+#SBATCH --job-name=tune_{args.strategy}_{param_name}
+#SBATCH --output=../logs/tune_{args.strategy}_{param_name}_%j.log
+#SBATCH --error=../logs/tune_{args.strategy}_{param_name}_%j.err
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
