@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import sys
 import ast
 
-from config import DATA_DIR, initial_params, get_tuning_output_dir
-from utils import build_cnn_model, tune_hyperparameter
+from config import DATA_DIR, initial_params
+from utils import tune_hyperparameter, get_tuning_output_dir
 
 # Load preprocessed data
 data = np.load(f'{DATA_DIR}/preprocessed_data.npz')

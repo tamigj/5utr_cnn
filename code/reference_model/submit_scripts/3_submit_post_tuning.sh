@@ -7,6 +7,7 @@
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:1
 
-conda activate cnn_env
+source activate cnn_env
 
-python ../post_tuning_model.py
+# Pass argument for output filename suffix
+python ../post_tuning_model.py wide

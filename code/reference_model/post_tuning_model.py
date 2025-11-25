@@ -5,8 +5,9 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import sys
 
-from config import post_tuning_params, NUM_EPOCH, DATA_DIR, OUTPUT_TUNING_DIR
+from config import updated_params_1, NUM_EPOCH, DATA_DIR, OUTPUT_TUNING_DIR
 from utils import build_cnn_model
 
 # Load preprocessed data
@@ -20,11 +21,20 @@ X_test = data['X_test']
 Y_test = data['Y_test']
 
 # Extract parameters
-batch_size = post_tuning_params['batch_size']
+batch_size = updated_params_1['batch_size']
 steps_per_epoch = len(X_train) // batch_size
 
+# Get output suffix from command line argument
+if len(sys.argv) < 2:
+    output_suffix = 'tuning'  # default
+    print("Warning: No output suffix provided, using 'tuning' as default")
+    print("Usage: python post_tuning_model.py <suffix>")
+    print("Example: python post_tuning_model.py round_1")
+else:
+    output_suffix = sys.argv[1]
+
 # Build model
-model_params = {k: v for k, v in post_tuning_params.items() if k != 'batch_size'}
+model_params = {k: v for k, v in updated_params_1.items() if k != 'batch_size'}
 model = build_cnn_model(**model_params, steps_per_epoch=steps_per_epoch)
 
 # Print model summary
@@ -46,6 +56,7 @@ plt.ylabel('MSE Loss')
 plt.ylim((0,3))
 plt.title('Training and Validation Loss (post-tuning parameters)')
 plt.legend()
-plt.savefig(f'{OUTPUT_TUNING_DIR}/post_tuning.png',
+plt.savefig(f'{OUTPUT_TUNING_DIR}/post_{output_suffix}.png',
             dpi=300, bbox_inches='tight')
 plt.close()
+print(f"Saved plot to {OUTPUT_TUNING_DIR}/post_{output_suffix}.png")

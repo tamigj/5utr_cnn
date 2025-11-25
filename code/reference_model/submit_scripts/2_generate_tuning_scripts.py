@@ -72,7 +72,7 @@ for param_name, param_values in tuning_grid.items():
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
 
-conda activate cnn_env
+source activate cnn_env
 python ../hyperparameter_tuning.py {args.strategy} {param_name} {values_str}
 """
     
