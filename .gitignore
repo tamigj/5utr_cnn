@@ -1,9 +1,15 @@
-# Data and outputs (usually excluded)
+# Data and outputs
 data/
 output/
 logs/
+
+# Submit scripts 
+submit_scripts/
 **/generated_scripts/
 submit_*.sh
+
+# Exploratory analysis
+**/exploratory/
 
 # Python stuff
 __pycache__/
