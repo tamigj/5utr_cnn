@@ -3,6 +3,7 @@ data/
 output/
 logs/
 **/generated_scripts/
+submit_*.sh
 
 # Python stuff
 __pycache__/
