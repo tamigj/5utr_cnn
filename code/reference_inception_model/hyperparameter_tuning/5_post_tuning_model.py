@@ -12,6 +12,7 @@ This script:
 
 import os
 import sys
+import time
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -48,11 +49,16 @@ print()
 
 # Train the model
 print("Training model...")
+start_time = time.time()
 results = train_inception_model(
     best_params.copy(),
     output_dir=EVAL_OUTPUT_DIR,  # Training curve will go here
     verbose=1
 )
+elapsed_time = time.time() - start_time
+hours = int(elapsed_time // 3600)
+minutes = int((elapsed_time % 3600) // 60)
+seconds = int(elapsed_time % 60)
 
 # Get the trained model from results
 model = results['model']
@@ -160,5 +166,6 @@ print("=" * 70)
 print(f"\nModel saved to: {MODEL_OUTPUT_DIR}/")
 print(f"Evaluation outputs saved to: {EVAL_OUTPUT_DIR}/")
 print(f"\nOverall Test R²: {r2_overall:.6f}")
+print(f"\nRuntime: {hours}h {minutes}m {seconds}s ({elapsed_time:.2f} seconds)")
 print("=" * 70)
 
