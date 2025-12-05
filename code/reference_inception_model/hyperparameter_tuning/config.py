@@ -52,7 +52,6 @@ wide_tuning_grid = {
     'n_dense_units': [32, 48, 64, 80, 96],
     'l2_lambda': [0.01, 0.05, 0.1, 0.2],
     'dropout_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
-    'batch_size': [32, 64, 128],
     'skip_dropout_in_first_conv_layer': [True, False],
     'filter_sizes': [
         [3, 5, 7],
@@ -62,20 +61,21 @@ wide_tuning_grid = {
         [3, 5, 7, 11],
         [3, 7, 11],
     ],
+    'batch_size': [32, 64, 128]
 }
 
 # Post-wide tuning parameters (will be updated after Phase 1)
 updated_params_1 = {
-    'batch_size': 64,
-    'dropout_rate': 0.1,
-    'filter_sizes': [3, 5, 7],
-    'l2_lambda': 0.1,
     'learning_rate': 0.001,
     'n_conv_layers': 5,
+    'n_filters': 32,
     'n_dense_layers': 1,
     'n_dense_units': 32,
-    'n_filters': 32,
+    'l2_lambda': 0.1,
+    'dropout_rate': 0.1,
     'skip_dropout_in_first_conv_layer': False,
+    'filter_sizes': [3, 5, 7],
+    'batch_size': 64,
 }
 
 # Phase 2: Combinatorial learning parameters
@@ -91,16 +91,16 @@ combinatorial_tuning_grid_learning = {
 # learning_rate=0.001, l2_lambda=0.05, dropout_rate=0.15, batch_size=128
 
 updated_params_2 = {
-    'batch_size': 128,
-    'dropout_rate': 0.15,
-    'filter_sizes': [3, 5, 7],
-    'l2_lambda': 0.05,
     'learning_rate': 0.001,
     'n_conv_layers': 5,
+    'n_filters': 32,
     'n_dense_layers': 1,
     'n_dense_units': 32,
-    'n_filters': 32,
+    'l2_lambda': 0.05,
+    'dropout_rate': 0.15,
     'skip_dropout_in_first_conv_layer': False,
+    'filter_sizes': [3, 5, 7],
+    'batch_size': 128,
 }
 
 # Phase 3: Combinatorial architecture parameters
@@ -120,16 +120,16 @@ combinatorial_tuning_grid_architecture = {
 # Best combination from architecture combinatorial tuning:
 # n_conv_layers=5, n_filters=32, n_dense_layers=1, n_dense_units=64, filter_sizes=[3,5,7]
 updated_params_3 = {
-    'batch_size': 128,
-    'dropout_rate': 0.15,
-    'filter_sizes': [3, 5, 7],
-    'l2_lambda': 0.05,
     'learning_rate': 0.001,
     'n_conv_layers': 5,
+    'n_filters': 32,
     'n_dense_layers': 1,
     'n_dense_units': 64,
-    'n_filters': 32,
+    'l2_lambda': 0.05,
+    'dropout_rate': 0.15,
     'skip_dropout_in_first_conv_layer': False,
+    'filter_sizes': [3, 5, 7],
+    'batch_size': 128,
 }
 
 # Phase 4: Remaining parameters to tune sequentially
