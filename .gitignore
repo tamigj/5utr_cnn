@@ -4,7 +4,7 @@ output/
 logs/
 
 # Submit scripts 
-submit_scripts/
+**/submit_scripts/
 **/generated_scripts/
 submit_*.sh
 
