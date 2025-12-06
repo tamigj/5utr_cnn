@@ -1,0 +1,13 @@
+Running filter extraction pipeline for model: /home/tami/5utr_cnn/output/variation_inception_model/richer_model/unfrozen_0.1_0.1_0.8_20p/model.h5
+
+Step 1: Extracting filters...
+  Extract job ID: 19076
+Step 2: Ranking filters...
+  Rank job ID: 19077 (depends on extract)
+Step 3: Visualizing filters...
+  Visualize job ID: 19078 (depends on extract)
+
+All jobs submitted!
+  Extract: 19076
+  Rank: 19077
+  Visualize: 19078
